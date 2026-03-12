@@ -19,3 +19,21 @@ The system scans resumes, extracts important keywords, and compares them with jo
 - Pandas
 
 ## Project Structure
+ai-resume-screening-system
+│
+├── src
+│   └── resume_screening.py
+│
+├── resumes
+│   └── sample_resume.pdf
+│
+├── docs
+│   ├── ERD.png
+│   └── project_proposal.pdf
+│
+├── requirements.txt
+└── README.md
+
+## System ERD
+
+![ERD](docs/APPJOBSCREENING.jpg)
