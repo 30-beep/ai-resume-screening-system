@@ -1,32 +1,28 @@
-
+from flask import Flask, render_template, request
 import os
 import pandas as pd
 from pdfminer.high_level import extract_text
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# Folder containing resumes
-RESUME_FOLDER = "resumes"
+app = Flask(__name__)
 
-# Example job description
-job_description = """
-Looking for a software developer with experience in Python, SQL,
-data analysis, machine learning, and problem solving.
-"""
+UPLOAD_FOLDER = "resumes"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def extract_resumes(folder):
-    resume_names = []
-    resume_texts = []
+    names = []
+    texts = []
 
     for file in os.listdir(folder):
         if file.endswith(".pdf"):
             path = os.path.join(folder, file)
             text = extract_text(path)
 
-            resume_names.append(file)
-            resume_texts.append(text)
+            names.append(file)
+            texts.append(text)
 
-    return resume_names, resume_texts
+    return names, texts
 
 
 def calculate_scores(job_desc, resumes):
@@ -41,22 +37,34 @@ def calculate_scores(job_desc, resumes):
     return similarity
 
 
-def rank_applicants():
+@app.route("/", methods=["GET", "POST"])
+def index():
 
-    names, resumes = extract_resumes(RESUME_FOLDER)
+    results = None
 
-    scores = calculate_scores(job_description, resumes)
+    if request.method == "POST":
 
-    data = pd.DataFrame({
-        "Applicant": names,
-        "Score": scores
-    })
+        job_description = request.form["job_description"]
 
-    ranked = data.sort_values(by="Score", ascending=False)
+        files = request.files.getlist("resumes")
 
-    print("\n=== Ranked Applicants ===\n")
-    print(ranked)
+        for file in files:
+            if file.filename.endswith(".pdf"):
+                file.save(os.path.join(UPLOAD_FOLDER, file.filename))
+
+        names, resumes = extract_resumes(UPLOAD_FOLDER)
+
+        scores = calculate_scores(job_description, resumes)
+
+        data = pd.DataFrame({
+            "Applicant": names,
+            "Score": scores
+        })
+
+        results = data.sort_values(by="Score", ascending=False)
+
+    return render_template("index.html", results=results)
 
 
 if __name__ == "__main__":
-    rank_applicants()
+    app.run(debug=True)
