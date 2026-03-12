@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Resume Screening System</title>
+</head>
+
+<body>
+
+<h1>AI Resume Screening and Ranking System</h1>
+
+<form method="POST" enctype="multipart/form-data">
+
+<label>Job Description</label><br>
+<textarea name="job_description" rows="6" cols="60"></textarea><br><br>
+
+<label>Upload Resumes (PDF)</label><br>
+<input type="file" name="resumes" multiple><br><br>
+
+<button type="submit">Analyze</button>
+
+</form>
+
+{% if results %}
+
+<h2>Ranked Applicants</h2>
+
+<table border="1">
+<tr>
+<th>Applicant</th>
+<th>Score</th>
+</tr>
+
+{% for row in results.values %}
+<tr>
+<td>{{ row[0] }}</td>
+<td>{{ "%.3f"|format(row[1]) }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+{% endif %}
+
+</body>
+</html>
