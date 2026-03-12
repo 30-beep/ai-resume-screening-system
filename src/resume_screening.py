@@ -1,4 +1,4 @@
-```python
+
 import os
 import pandas as pd
 from pdfminer.high_level import extract_text
